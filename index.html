@@ -104,7 +104,7 @@ footer { font-size: 13px; color: var(--muted); }
 
 <div class="wrap">
   <header>
-    <span class="kicker">Hratelné kapitoly 1–3 ze 6</span>
+    <span class="kicker">Příběhová hra · 6 kapitol · 1988–2026</span>
     <h1>Závazek</h1>
     <p class="sub">Michal, ročník 1970. Maturant, smečař v okresním volejbale. Táta mistr ve fabrice, ve straně „protože se to tak dělá“. Máma na poště. Nikdo z nich nikdy nic nepodepsal.</p>
   </header>
@@ -129,6 +129,24 @@ footer { font-size: 13px; color: var(--muted); }
 const F = st => st.flags;
 const went = st => F(st).podepsal || F(st).svejk;        // jel do Lince
 const martinInLinec = st => went(st) && !F(st).prozradil;
+const agent = st => F(st).podepsal || F(st).svejk;
+const abroad = st => F(st).zustalVen && !F(st).vratil92;
+const martinAgent = st => !agent(st) && !F(st).sMartinem;   // Martin = NAHRÁVAČ
+function reveal(st) {
+  const f = F(st), r = [];
+  r.push("Strana 2. Zdroj KUBÍČKOVÁ podávala zprávy o vaší rodině od roku 1979. Celkem 312 zpráv. Většinou o tom, co se u vás vařilo.");
+  r.push("Strana 4. Otec H. osloven ke spolupráci v roce 1975. Odmítl. Návrh: nepovyšovat.");
+  if (agent(st)) r.push("Strana 7. Vázací akt. Tvůj podpis. Písmo maturanta, který se snaží, aby to vypadalo dospěle.");
+  if (f.prozradil) r.push("Strana 9. Na základě výpovědi H. Michala z října 1988 vyřazen H. Martin z výjezdu do Lince.");
+  if (f.hlasil) r.push("Strana 12. Na základě zprávy agenta SMEČAŘ odebrán H. Martinovi vkládací list. Pod tím poznámka: agent spolehlivý.");
+  if (f.svejk) r.push("Strana 11. Hodnocení agenta SMEČAŘ: Nelze určit, zda jde o záměr, nebo o omezenost. Pod tím jinou rukou, tužkou: Záměr.");
+  if (martinAgent(st)) r.push("Strana 8. Zprávy zdroje NAHRÁVAČ o tobě, celkem 23. Na poslední straně registrační protokol: NAHRÁVAČ = Holub Martin, získán " + (f.rekl ? "týden poté, cos mu o pohovoru řekl." : "v listopadu 1988."));
+  if (f.dalSeznam) r.push("Strana 15. Seznam čtrnácti studentů stávkové hlídky, tvým písmem. Odesláno výš. Nikdo to nezpracoval. Ty sám to zpracováváš každou noc dodnes.");
+  if (f.babicka) r.push("Strana 15. Seznam stávkové hlídky: Barunka, Viktorka, myslivec. Koubkova poznámka: prověřit. Pod ní: prověřeno, Němcová.");
+  if (f.podpisVojna) r.push("Strana 16. Kopie hlášení vojenské kontrarozvědky o podezřelé zásadovosti. Někdo to slovo podtrhl dvakrát.");
+  if (f.emigroval) r.push("Strana 18. Trestní stíhání pro nedovolené opuštění republiky. Zastaveno roku 1990.");
+  return r;
+}
 
 /* ---------- příběh ---------- */
 const S = {
@@ -580,10 +598,222 @@ const S = {
       return "Tátu odvolají v lednu. Ty se vrátíš na fakultu a pokračuješ ve stávce. Nikdo se tě na nic neptá. Zatím.";
     },
     rec: ["npor. Koubek", "4. 12. 1989. Svazek č. 24-881 navržen ke skartaci. Pro nedostatek času zatím neprovedeno."],
-    next: "c4_soon"
+    next: "c4_title"
   },
 
-  c4_soon: { soon: true }
+  /* ===== KAPITOLA 4 ===== */
+  c4_title: { chapter: "Kapitola čtvrtá", title: "Seznamy", lead: "Rok 1992. Republika se dělí, majetek se rozdává a seznamy se tisknou. Všechno najednou a všechno abecedně.", next: "c4_route" },
+  c4_route: { route: st => F(st).zustalVen ? "c4_ciz" : "c4_kiosk" },
+
+  c4_kiosk: {
+    where: "Červen 1992 · trafika na náměstí",
+    text: [
+      "U trafiky stojí fronta jako dřív na banány. Prodávají se noviny se seznamy spolupracovníků StB. Abecedně, s rokem narození. Lidi je čtou rovnou na chodníku, potichu, pohybujíce rty.",
+      st => agent(st) ? "Pod písmenem H nenajdeš Holuba Martina. Najdeš sebe. H. Michal, 1970, agent. Je to nejkratší řádek, jaký jsi kdy četl." : "",
+      st => F(st).svejk ? "Krycí jméno tam není. Škoda, napadne tě. SMEČAŘ by se tam vyjímalo." : "",
+      st => !agent(st) ? "Pod H nejsi. Úleva je fyzická, jako když si po tréninku sedneš. Pak hledáš dál, sám nevíš proč. Pod K: Kubíčková Marie, 1931, důvěrník." : "",
+      "Paní Kubíčková stojí ve frontě dva lidi před tebou. Kupuje troje noviny."
+    ],
+    choices: [
+      { t: "Koupit všech čtyřicet výtisků, co má trafikantka pod pultem.", to: "c4_martin", if: agent, flag: "skoupil", rec: ["trafikantka", "Mladý H. koupil 40 výtisků najednou. Nejlepší tržba od Silvestra. Druhý den jich přivezli dvě stě."] },
+      { t: "Koupit jedny a jít s nimi domů za rodiči.", to: "c4_martin", flag: "ukazalRodicum", rec: ["sousedka Kubíčková (už jen sousedka)", "Mladý H. nesl domů noviny. Já taky. Na schodech jsme se nepozdravili, ačkoli jsme oba věděli proč."] },
+      { t: "Klepnout paní Kubíčkové na rameno a ukázat jí její řádek.", to: "c4_martin", if: st => !agent(st), flag: "ukazalKubickove", rec: ["sousedka Kubíčková (už jen sousedka)", "Mladý H. mi ukázal moje jméno v novinách. Řekla jsem mu, že jsem nikomu neublížila. Psala jsem jen o knedlících."] },
+      { t: "Nekoupit nic a jít dál.", to: "c4_martin" }
+    ]
+  },
+  c4_martin: {
+    where: "Červen 1992 · hospoda U Zeleného stromu",
+    text: [
+      st => agent(st) && (F(st).hlasil || F(st).prozradil) ? "Martin sedí u výčepu. Před sebou má noviny a tvoje jméno podtržené propiskou dvakrát. „Takže Linec,“ řekne a nedívá se na tebe. „Já se dva roky ptal ségry, jestli to byla ona. Dva roky, Michale.“" : "",
+      st => F(st).podepsal && !(F(st).hlasil || F(st).prozradil) ? "Martin si k tobě přisedne s novinami. „Tak ty jsi tam.“ Chvíli mlčí. „A co jsi o mně psal?“" : "",
+      st => F(st).svejk && !(F(st).hlasil || F(st).prozradil) ? "Martin se směje tak, že se celá hospoda otočí. „Ty vole. Tebe tam fakt dali. Co jsi jim psal, recepty?“ Pak přestane. „Psal jsi o mně?“" : "",
+      st => !agent(st) ? "Martin přinese dvě piva. „Tak jsme čistý, ne? Oba.“ Ťukne si s tebou a napije se rychleji než obvykle." : "",
+      st => F(st).zastalSe || F(st).priznalFabrika ? "Od stolu u okna na tebe kývne chlap z tátovy fabriky. Ten, co tenkrát na dvoře křičel. Teď vede privatizační projekt své dílny." : ""
+    ],
+    choices: [
+      { t: "Říct mu všechno, co jsi kdy napsal.", to: "c4_koubek", if: agent, flag: "rekl1992", rec: ["hostinský", "Pánové u výčepu mluvili tiše dvě hodiny. Jeden zaplatil za oba. Kdo, nevím. Zapisovat si to už nemusím, ale zvyk je železná košile."] },
+      { t: "„Nic, čím bych ti ublížil.“", to: "c4_koubek", if: agent, flag: "zatloukl" },
+      { t: "„Že máš slabé podání. Což je pravda.“", to: "c4_koubek", if: st => F(st).svejk, flag: "podani" },
+      { t: "„Jasně. Oba.“", to: "c4_koubek", if: st => !agent(st) },
+      { t: "„Tebe taky volali, ne? Týden po mně.“", to: "c4_koubek", if: st => !agent(st), flag: "zeptalSe" }
+    ]
+  },
+  c4_koubek: {
+    where: "Září 1992 · cestovní kancelář Zlatý jelen Tour",
+    text: [
+      "Kancelář je v bývalé prodejně Mototechny. Na zdi visí plakát Lince, který znáš. Z hotelu Zum Goldenen Hirschen.",
+      "Za stolem sedí Koubek v saku, které je mu velké v ramenou. Na vizitce stojí: Ing. Koubek, jednatel. Inženýr nebyl nikdy.",
+      st => F(st).zeptalSe ? "Ještě v hospodě ti Martin odpověděl: „Odmít jsem to. Jasně že jo.“ Slovo od slova stejně jako tenkrát v šatně." : "",
+      st => agent(st) ? "„Michale! Lidi jako ty umí psát přesná hlášení. V cestovním ruchu se to hodí. Recenze hotelů, zprávy z výletů. Vozíme Čechy do Lince na nákupy. A s tím tvým lustračním osvědčením stejně státním zástupcem nebudeš, víš to?“" : "„Michale! Ty jsi mi tenkrát řekl ne. Toho si vážím. Charakter. Takové lidi hledám. Založil jsem investiční fond Zlatý jelen. Svěř nám kupónovou knížku a za rok máš desetinásobek. Garantuju.“",
+      st => agent(st) ? "Vedle stojí i stojánek s letáky fondu Zlatý jelen. Desetinásobek za rok, garantováno." : ""
+    ],
+    choices: [
+      { t: st => agent(st) ? "Vzít práci. Linec, autobus, nákupy." : "Podepsat mu kupónovou knížku. Třetí podpis v životě.", to: "c4_konec", flag: "koubek92", rec: ["Ing. Koubek, jednatel", st => agent(st) ? "Přijat zaměstnanec H. Michal, průvodce. Spolehlivý, zkušený v podávání zpráv." : "Klient H. Michal svěřil fondu kupónovou knížku. Investice do sklárny, cukrovaru a jedné firmy na Kypru."] },
+      { t: "Odejít. Tentokrát to nebolí tolik.", to: "c4_konec", flag: "odmitl92" },
+      { t: "„Beru, ale jen když fond bude investovat výhradně do jogurtů.“", to: "c4_konec", if: st => F(st).svejk, flag: "jogurty", rec: ["Ing. Koubek, jednatel", "Klient H. Michal podmínil investici jogurty. Odmítnuto. Klient trval na svém. Po hodině odešel. Já také, na pivo."] }
+    ]
+  },
+
+  c4_ciz: {
+    where: st => F(st).kanada ? "Červen 1992 · Toronto, krajanský klub" : "Červen 1992 · Vídeň, Favoriten",
+    text: [
+      "Máma ti posílá dopis každý měsíc. Tenhle je tlustší. Uvnitř je výstřižek z novin se seznamy a lístek jejím písmem.",
+      st => agent(st) ? "Ve výstřižku je tvoje jméno. H. Michal, 1970, agent. Na lístku stojí: Táta s tím chce jít na úřad, že je to omyl. Je to omyl? Máma." : "Ve výstřižku je jméno paní Kubíčkové. Máma připsala: Pořád ti posílá pozdrav. Nevím, co jí mám říct.",
+      st => F(st).kanada ? "Na stěně krajanského klubu visí mapa Československa, které za půl roku nebude." : "Venku zvoní tramvaj. Zní úplně stejně jako doma, jen víc nahlas."
+    ],
+    choices: [
+      { t: "Napsat domů celou pravdu.", to: "c4_konec", flag: "psalPravdu", rec: ["máma (na okraj dopisu, který nikdy neodeslala)", "Já to věděla. Matky to vědí. Ale táta ne. Tátovi to neřeknu."] },
+      { t: "Odepsat o počasí.", to: "c4_konec", flag: "pocasi" },
+      { t: "Koupit letenku domů. Jednosměrnou.", to: "c4_konec", flag: "vratil92" }
+    ]
+  },
+
+  c4_konec: {
+    end: true, chapter: "Konec čtvrté kapitoly",
+    title: "1. ledna 1993",
+    lead: st => {
+      const f = F(st);
+      if (f.zustalVen && !f.vratil92) return "Na Silvestra se rozdělí republika. Nevíš, kterou z nich máš teď opustit. Kupónovou knížku ti nikdo neposlal.";
+      if (f.vratil92) return "Letíš domů do republiky, která za týden přestane existovat. Na letišti tě čeká táta. Neřekne nic o novinách. Řekne: „Vypadáš hubeně.“";
+      if (f.koubek92 && agent(st)) return "Tři roky vozíš autobusy Čechů do Lince. V samoobsluze je pořád jedenáct druhů jogurtu. Lidem to už nepřijde divné. Tobě pořád ano.";
+      if (f.koubek92) return "Fond Zlatý jelen se v roce 1996 rozplyne. Koubek odletí na Kypr. Na fondu zůstane cedule a sklárna bez skla.";
+      if (f.jogurty) return "Fond Zlatý jelen zkrachuje v roce 1996. Jediný, kdo nepřijde o kupónovou knížku, jsi ty. Lidé tomu říkají prozíravost.";
+      if (agent(st)) return "Dokončíš práva. Státním zástupcem být nemůžeš, tak jdeš do advokacie. Hájíš restituenty, privatizéry a jednou i bývalého estébáka. Platí dobře.";
+      return "Dokončíš školu. Kupónovou knížku vyměníš s Martinem za jeho starou škodovku. Je to nejlepší obchod devadesátých let, který znáš.";
+    },
+    rec: st => agent(st) ? ["FMV, lustrační oddělení", "Lustrační osvědčení H. Michal, nar. 1970: pozitivní. Evidován jako agent."] : ["FMV, lustrační oddělení", "Lustrační osvědčení H. Michal, nar. 1970: negativní. Žadatel nebyl evidován."],
+    next: "c5_title"
+  },
+
+  /* ===== KAPITOLA 5 ===== */
+  c5_title: { chapter: "Kapitola pátá", title: "Archiv", lead: "Rok 2008. Archivy jsou otevřené. Kdo chce, může si přečíst, co o něm psali druzí. A co psal sám.", next: "c5_dopis" },
+
+  c5_dopis: {
+    where: "Březen 2008 · kuchyňský stůl",
+    text: [
+      st => abroad(st)
+        ? "Je ti třicet osm. Žiješ " + (F(st).kanada ? "v Torontu" : "ve Vídni") + ". Dcera Klára má osm let, česky mluví s přízvukem a babičce říká grandma."
+        : "Je ti třicet osm. Máš dceru Kláru, je jí osm. Hypotéku na byt v novostavbě a služební Octavii, kterou neumíš zaparkovat.",
+      st => F(st).koubek92 && agent(st) ? "Koubek tě v roce 2001 propustil. Prý ti chyběla loajalita k firmě." : "",
+      st => abroad(st) ? "Máma ti poslala obálku. Uvnitř je formulář a lístek: Kdyby tě to zajímalo. Já to číst nechci." : "",
+      "Na stole leží formulář archivu: Žádost o zpřístupnění svazku. Stačí jméno, datum narození a podpis. Zase podpis."
+    ],
+    choices: [
+      { t: "Vyplnit a podepsat.", to: "c5_studovna", flag: "zadal" },
+      { t: "Formulář zmačkat a hodit do koše.", to: "c5_nezadal" },
+      { t: "Vyplnit a pro úplnost přiložit vlastní opis hlášení o jogurtech.", to: "c5_studovna", if: st => F(st).svejk, flags: ["zadal", "prilohaJogurty"], rec: ["Archiv bezpečnostních složek", "Žadatel H. Michal přiložil k žádosti vlastní text o jogurtech (11 stran). Zařazeno do svazku. Svazek je tím úplnější než před rokem 1989."] }
+    ]
+  },
+  c5_studovna: {
+    where: "Duben 2008 · badatelna archivu, Praha",
+    text: [
+      "Svazek je tenčí, než sis myslel. Pár desítek listů v šedých deskách se šňůrkou. Na obálce razítko NAVRŽENO KE SKARTACI a pod ním perem: neprovedeno.",
+      "Koubek to nestihl. Pravda přežila díky tomu, že se někomu v prosinci 1989 nechtělo.",
+      st => reveal(st)
+    ],
+    choices: [
+      { t: "Okopírovat stránku o tátovi a jet za ním.", to: "c5_tata", flag: "kopie" },
+      { t: "Zavolat Martinovi přímo z chodby.", to: "c5_martin", if: st => martinAgent(st) },
+      { t: "Zavřít desky a jít ven na vzduch.", to: "c5_konec" }
+    ]
+  },
+  c5_martin: {
+    where: "Duben 2008 · chodba archivu, telefon",
+    text: [
+      "Martin to vezme po prvním zazvonění, jako by čekal. „Tak už to víš,“ řekne dřív, než stihneš cokoli říct.",
+      st => F(st).rekl
+        ? "„Pozvali si mě týden poté, cos mi o pohovoru řekl. Myslel jsem, že jsi podepsal ty. Že jsi mi to řekl, abys mě prověřil. Nechtěl jsem bejt jedinej, kdo je čistej a blbej.“"
+        : "„Pozvali si mě týden po tobě. Ten v hnědý bundě. Nabídl mi Linec. A já jel. Ty ne.“",
+      "Chvíli je ticho. „Psal jsem hlavně o volejbale,“ dodá. „Teda, většinou.“"
+    ],
+    choices: [
+      { t: "„Přijď v sobotu na pivo. U Zeleného stromu, jako dřív.“", to: "c5_tata", flag: "pivo2008" },
+      { t: "Zavěsit.", to: "c5_tata", flag: "zavesil" },
+      { t: "„Psal jsi taky o knedlících, jako Kubíčková?“", to: "c5_tata", flag: "knedliky", rec: ["Martin H. (v telefonu, smíchem i pláčem zároveň)", "O knedlících ne. Jednou o tom, že tvoje máma dělá nejlepší buchty v okrese. To tam je. Podepsaný NAHRÁVAČ."] }
+    ]
+  },
+  c5_nezadal: {
+    where: "Květen 2008 · telefon, večer",
+    text: [
+      "Formulář skončí v koši. O měsíc později ti volá Martin. Svůj svazek si přečetl on.",
+      st => martinAgent(st)
+        ? "„Michale, já jsem tam taky. Ne jako sledovanej. Jako NAHRÁVAČ. Psal jsem o tobě, od listopadu osmaosmdesát. Volám, abys to nečetl od nich.“"
+        : (F(st).sMartinem
+          ? "„Jsme tam oba, jako nepřátelé státu. Trestní stíhání v nepřítomnosti, zastaveno 1990. Já si to dám zarámovat nad gauč.“"
+          : (agent(st) && (F(st).hlasil || F(st).prozradil)
+            ? "„Je tam tvoje zpráva. Kvůli ní mi vzali vkládačku. Psals to v kavárně Moskva. Koubek si tam poznamenal i ten větrník.“"
+            : (F(st).svejk
+              ? "„Je tam, že mám slabý podání. Podepsáno SMEČAŘ. Smál jsem se tak, že mě vyvedli z badatelny.“"
+              : "„Psals o mně, že se chovám vzorně. Šestkrát. Víš, jak divný je číst, že jsem byl vzornej, protože jsi to napsal ty?“")))
+    ],
+    choices: [
+      { t: "„A co tam bylo o mně?“", to: "c5_tata" },
+      { t: "Zavěsit a jít za tátou.", to: "c5_tata", flag: "zavesil" }
+    ]
+  },
+  c5_tata: {
+    where: "Červen 2008 · zahrádkářská kolonie za městem",
+    text: [
+      st => abroad(st) ? "Kvůli tomu jsi přiletěl. Prvně za čtyři roky." : "",
+      "Táta roubuje růže. Je mu šedesát tři a ruce se mu trochu třesou, ale řez má pořád přesný.",
+      st => F(st).kopie ? "Podáš mu kopii stránky čtyři. Otec H. osloven ke spolupráci v roce 1975. Odmítl. Návrh: nepovyšovat. Podepsán Koubek, tehdy ještě podporučík." : "Zeptáš se ho na rok 1975. Nevíš proč zrovna na ten. Martin se o něm zmínil, protože v jeho svazku byl odkaz.",
+      "Táta si sundá brýle. „Já vím, co tam je. Nemusels to vozit.“",
+      "„Řekl jsem ti tenkrát u večeře, že po mně nikdo nikdy nic nechtěl. To nebyla pravda. Chtěli. Odmítl jsem a stálo mě to dvanáct let na místě mistra. Nechtěl jsem, abys věděl, že se to dá odmítnout. Protože pak bys musel.“",
+      st => agent(st) ? "Odloží nůž. „A vím, že ty jsi podepsal. Kubíčková mi to řekla na schodech, v dvaadevadesátým. Byla ráda, že není jediná.“" : "",
+      st => F(st).odmitl ? "Odloží nůž. „A ty jsi odmítl taky. Bez varování. Byl jsem na tebe pyšnej a zároveň jsem tě chtěl zabít. Obojí najednou. Tak to s dětma je.“" : ""
+    ],
+    choices: [
+      { t: "Obejmout ho, i když jste to nikdy nedělali.", to: "c5_konec", flag: "objal" },
+      { t: "„Proč jsi mi to neřekl?“", to: "c5_konec", flag: "vycital" },
+      { t: "Mlčky mu podržet růži, než ji dováže.", to: "c5_konec", flag: "ruze" }
+    ]
+  },
+  c5_konec: {
+    end: true, chapter: "Konec páté kapitoly",
+    title: "Léto 2008",
+    lead: st => {
+      const f = F(st);
+      if (f.objal) return "Táta se nejdřív nehýbe. Pak tě poplácá po zádech dvakrát, jako po dobrém zápase. Na podzim ti přinese první růži z toho roubu.";
+      if (f.vycital) return "„Protože jsi byl můj kluk,“ řekne. „A ne můj hrdina.“ Pak se vrátí k růžím a ty víš, že víc už k tomu neřekne nikdy.";
+      if (f.ruze) return "Růže se ujme. Táta pak každému říká, že ji roubovali spolu. Je to první věc, kterou spolu dvacet let opravdu dělali.";
+      return "Desky leží doma ve skříni. Klára je jednou najde, když bude hledat svoje vysvědčení z první třídy.";
+    },
+    rec: st => F(st).zadal ? ["Archiv bezpečnostních složek", "Svazek č. 24-881 zpřístupněn žadateli. Žadatel strávil v badatelně 4 hodiny 12 minut. Nic neokopíroval kromě strany 4."] : ["Archiv bezpečnostních složek", "Svazek č. 24-881 uložen. O nahlédnutí nikdo nepožádal."],
+    next: "c6_title"
+  },
+
+  /* ===== KAPITOLA 6 ===== */
+  c6_title: { chapter: "Kapitola šestá", title: "Mikrofon", lead: "Rok 2026. Je ti padesát šest. Do listopadu zbývá pár týdnů, jako každý rok.", next: "c6_rozhovor" },
+  c6_rozhovor: {
+    where: "Listopad 2026 · obývák",
+    text: [
+      "Klára učí dějepis na gymnáziu. Na konferenční stolek postaví mikrofon a hrnek čaje pro tebe. „Natáčím rozhovory s pamětníky. Pro třeťáky. Je jim tolik, kolik bylo tobě.“",
+      st => agent(st) ? "Zmáčkne nahrávání. „Tati, já jsem tě v archivu našla. Vím, žes to četl. Chci to slyšet od tebe. Podepsal jsi to?“" : "",
+      st => !agent(st) && F(st).odmitl && !F(st).emigroval ? "Zmáčkne nahrávání. „Babička vždycky říkala, že jsi v osmaosmdesátým něco odmítl, a proto jsi musel na vojnu. Co to bylo? A proč jsi to odmítl?“" : "",
+      st => F(st).emigroval ? (abroad(st) ? "Zmáčkne nahrávání. „Tati, proč jsi utekl? A proč ses už nikdy nevrátil?“" : "Zmáčkne nahrávání. „Tati, proč jsi utekl? A proč ses vrátil?“") : "",
+      "Dívá se na tebe stejně jako táta tenkrát přes vepřo knedlo."
+    ],
+    choices: [
+      { t: "Říct pravdu. Celou, i ty nepohodlné kusy.", to: "c6_konec", flag: "pravda26", rec: ["Klára H., poznámky k rozhovoru", "Pamětník mluvil 2 h 14 min. Plakala jsem já, ne on. Použiju celé, bez střihu."] },
+      { t: "Říct verzi, ve které jsi byl o kousek statečnější.", to: "c6_konec", flag: "hrdina26", rec: ["Klára H., poznámky k rozhovoru", "Pamětník vyprávěl o odvaze. Některé údaje nesedí s archivem. Nechám je tam. Je to můj táta."] },
+      { t: "Vyprávět to jako historku. U jogurtů se lidi vždycky smějí.", to: "c6_konec", flag: "svejk26", rec: ["Klára H., poznámky k rozhovoru", "Pamětník byl vtipný, třeťáci se smáli. Jeden se pak zeptal, jestli to bylo vtipné i tenkrát. Pamětník neodpověděl."] },
+      { t: "„Vypni to.“", to: "c6_konec", flag: "vypni26", rec: ["Klára H., poznámky k rozhovoru", "Nahrávka: 0 min 41 s. Zbytek mimo záznam. Mimo záznam to bylo to nejdůležitější."] }
+    ]
+  },
+  c6_konec: {
+    end: true, chapter: "Konec",
+    title: "Svazek uzavřen",
+    lead: st => {
+      const f = F(st);
+      if (f.pravda26) return "Třeťáci si rozhovor pustí v pondělí. Jedna holka se pak zeptá: „A co byste udělal dneska?“ Klára jí řekne, ať se zeptá sama sebe. Za čtyřicet let se jí na to někdo zeptá taky.";
+      if (f.hrdina26) return "Rozhovor se třeťákům líbí. Jeden z nich si ho najde v archivu a zjistí, že něco nesedí. Nikomu to neřekne. Rozumí tomu líp, než by si přál.";
+      if (f.svejk26) return "Historka o jogurtech se mezi třeťáky ujme. Za rok ji vypráví i ti, kteří tě nikdy neviděli. Pravda se z ní mezitím vypařila. Zůstal jen smích, a ten taky není úplně lež.";
+      return "Mikrofon zhasne. Klára ho schová do tašky a sedne si k tobě na gauč. Mluvíte do noci. Nikdo to nezapíše. Poprvé po čtyřiceti letech nikdo nic nezapisuje.";
+    },
+    next: "final"
+  },
+
+  final: { soon: true }
 };
 
 /* ---------- engine ---------- */
@@ -632,12 +862,12 @@ function render() {
   if (n.chapter) return renderCard(n);
   $scene.appendChild(el("div", "where", val(n.where, st)));
   const prose = el("div", "prose fade");
-  n.text.map(p => val(p, st)).filter(Boolean).forEach(p => prose.appendChild(el("p", null, p)));
+  n.text.flatMap(p => [].concat(val(p, st))).filter(Boolean).forEach(p => prose.appendChild(el("p", null, p)));
   $scene.appendChild(prose);
   const ch = el("div", "choices fade");
   n.choices.filter(c => !c.if || c.if(st)).forEach((c, i) => {
     const b = el("button", "choice"); b.type = "button"; b.id = "c-" + st.node + "-" + i;
-    b.append(el("span", "k", String.fromCharCode(97 + i) + ")"), el("span", null, c.t));
+    b.append(el("span", "k", String.fromCharCode(97 + i) + ")"), el("span", null, val(c.t, st)));
     b.addEventListener("click", () => pick(c));
     ch.appendChild(b);
   });
@@ -651,7 +881,8 @@ function renderCard(n) {
   const b = el("button", "choice"); b.type = "button"; b.id = "next-" + st.node;
   b.append(el("span", "k", "→"), el("span", null, n.end ? "Pokračovat" : "Začít"));
   b.addEventListener("click", () => {
-    if (n.rec) { st.records.push([val(n.rec[0], st), val(n.rec[1], st)]); drawRecords(true); }
+    const r = val(n.rec, st);
+    if (r) { st.records.push([val(r[0], st), val(r[1], st)]); drawRecords(true); }
     go(n.next); scrollUp();
   });
   box.appendChild(b);
@@ -660,15 +891,12 @@ function renderCard(n) {
 
 function renderSoon() {
   const box = el("div", "chapter fade");
-  box.append(el("span", "num", "Kapitola čtvrtá"), el("h2", null, "Seznamy"));
+  box.append(el("span", "num", "Závazek"), el("h2", null, "Konec hry"));
   const p = el("div", "prose");
-  const f = st.flags;
-  const line = (f.zustalVen)
-    ? "Rok 1992. V Praze vyjdou seznamy spolupracovníků StB. Dozvíš se to z krajanských novin, o měsíc později než ostatní."
-    : ((f.podepsal || f.svejk)
-      ? "Rok 1992. V novinách vyjdou seznamy spolupracovníků StB. Koubek mezitím otevřel cestovní kancelář a hledá schopné lidi."
-      : "Rok 1992. V novinách vyjdou seznamy spolupracovníků StB. Ty v nich nejsi. Začneš číst, kdo v nich je.");
-  p.append(el("p", null, line), el("p", null, "Tahle kapitola se teprve píše. Tvoje rozhodnutí si hra pamatuje."));
+  p.append(
+    el("p", null, "Hra ti neřekne, jestli ses rozhodl dobře. Spis pod tímhle textem tě taky nesoudí. Jen zapisuje, jako vždycky, trochu nepřesně."),
+    el("p", null, "Za Michala se dá žít ještě jinými způsoby. Kdo podepsal, může zkusit odmítnout. Kdo odmítl, může zkusit švejkovat. A kdo utekl, může zkusit zůstat.")
+  );
   box.appendChild(p);
   const b = el("button", "choice"); b.type = "button"; b.id = "again";
   b.append(el("span", "k", "↺"), el("span", null, "Zkusit to jinak od října 1988"));
