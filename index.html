@@ -88,6 +88,11 @@ h1 { font-family: var(--display); font-weight: 400; font-size: clamp(34px, 8vw, 
 .caret .t::after { content: "▌"; animation: blink 1s steps(1) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
 
+.recap { display: flex; flex-direction: column; gap: 14px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+.recap h3 { font-family: var(--display); font-weight: 400; font-size: 18px; margin: 0; }
+.recap section { display: flex; flex-direction: column; gap: 4px; }
+.recap .yr { font-family: var(--display); font-size: 13px; letter-spacing: .06em; color: var(--muted); text-transform: uppercase; }
+.recap ul { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 2px; font-size: 15px; }
 .tools { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
 .link { font: inherit; color: var(--muted); background: none; border: 0; padding: 0; text-decoration: underline; cursor: pointer; }
 .link:focus-visible { outline: 2px solid var(--carbon); outline-offset: 2px; }
@@ -592,7 +597,7 @@ const S = {
       const f = F(st);
       if (f.vratilSe) return "Na Štědrý den stojíš u dveří bytu. Máma otevře, podívá se na tebe a jde dosolit bramborový salát. Pak se v kuchyni rozpláče. Táta řekne jen: „Tak ses vrátil do jiný republiky.“";
       if (f.zustalVen) return f.kanada ? "V lednu letíš do Toronta. Doma všichni slaví a ty se díváš z letadla na Atlantik. Svobodný člověk, říká si. Ze všech nejsvobodnější." : "Silvestra slavíš ve Vídni na ulici s cizími lidmi. Doma slaví taky. Napíšeš domů dopis, který tentokrát poštou opravdu dojde. Přesto ho nepošleš.";
-      if (f.odmitl) return "Do civilu zbývá šest set osmdesát dní. Vojna se zkracuje, prý na rok. Kluci, kteří loni podepsali, už sedí na fakultách ve stávkových výborech. Ty čistíš samopal, který nikdy nebude potřeba.";
+      if (f.odmitl) return "Do civilu zbývá šest set osmdesát dní. Vojna se prý zkrátí na osmnáct měsíců. Kluci, kteří loni podepsali, už sedí na fakultách ve stávkových výborech. Ty čistíš samopal, který nikdy nebude potřeba.";
       if (f.priznalFabrika) return "Tátu nakonec neodvolají. Na tebe se dívají jinak. Kubíčková tě na schodech poprvé v životě nepozdraví. Ani ty ji.";
       if (f.zastalSe) return "Tátu odvolají v lednu na schůzi, na které promluví šest lidí, kteří byli ve straně déle než on. Večer se ptá: „Proč jsi tam tak křičel?“ Neodpovíš.";
       return "Tátu odvolají v lednu. Ty se vrátíš na fakultu a pokračuješ ve stávce. Nikdo se tě na nic neptá. Zatím.";
@@ -790,7 +795,7 @@ const S = {
       "Klára učí dějepis na gymnáziu. Na konferenční stolek postaví mikrofon a hrnek čaje pro tebe. „Natáčím rozhovory s pamětníky. Pro třeťáky. Je jim tolik, kolik bylo tobě.“",
       st => agent(st) ? "Zmáčkne nahrávání. „Tati, já jsem tě v archivu našla. Vím, žes to četl. Chci to slyšet od tebe. Podepsal jsi to?“" : "",
       st => !agent(st) && F(st).odmitl && !F(st).emigroval ? "Zmáčkne nahrávání. „Babička vždycky říkala, že jsi v osmaosmdesátým něco odmítl, a proto jsi musel na vojnu. Co to bylo? A proč jsi to odmítl?“" : "",
-      st => F(st).emigroval ? (abroad(st) ? "Zmáčkne nahrávání. „Tati, proč jsi utekl? A proč ses už nikdy nevrátil?“" : "Zmáčkne nahrávání. „Tati, proč jsi utekl? A proč ses vrátil?“") : "",
+      st => F(st).emigroval && !agent(st) ? (abroad(st) ? "Zmáčkne nahrávání. „Tati, proč jsi utekl? A proč ses už nikdy nevrátil?“" : "Zmáčkne nahrávání. „Tati, proč jsi utekl? A proč ses vrátil?“") : "",
       "Dívá se na tebe stejně jako táta tenkrát přes vepřo knedlo."
     ],
     choices: [
@@ -830,7 +835,8 @@ function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.
 function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
 function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); return s && S[s.node] ? s : null; } catch (e) { return null; } }
 
-function fresh() { return { node: "c1_title", flags: {}, records: [] }; }
+function fresh() { return { node: "c1_title", flags: {}, records: [], path: [] }; }
+const CHAPTERS = { c1: "1988 · Pohovor", c2: "1989 · Linec a hranice", c3: "1989 · Náměstí", c4: "1992 · Seznamy", c5: "2008 · Archiv", c6: "2026 · Mikrofon" };
 
 function drawRecords(animateLast) {
   $rec.innerHTML = "";
@@ -897,6 +903,22 @@ function renderSoon() {
     el("p", null, "Hra ti neřekne, jestli ses rozhodl dobře. Spis pod tímhle textem tě taky nesoudí. Jen zapisuje, jako vždycky, trochu nepřesně."),
     el("p", null, "Za Michala se dá žít ještě jinými způsoby. Kdo podepsal, může zkusit odmítnout. Kdo odmítl, může zkusit švejkovat. A kdo utekl, může zkusit zůstat.")
   );
+  const path = st.path || [];
+  if (path.length) {
+    const recap = el("div", "recap");
+    recap.appendChild(el("h3", null, "Tvoje cesta"));
+    Object.keys(CHAPTERS).forEach(ch => {
+      const items = path.filter(([c]) => c === ch);
+      if (!items.length) return;
+      const sec = el("section");
+      sec.appendChild(el("span", "yr", CHAPTERS[ch]));
+      const ul = el("ul");
+      items.forEach(([, t]) => ul.appendChild(el("li", null, t)));
+      sec.appendChild(ul);
+      recap.appendChild(sec);
+    });
+    p.appendChild(recap);
+  }
   box.appendChild(p);
   const b = el("button", "choice"); b.type = "button"; b.id = "again";
   b.append(el("span", "k", "↺"), el("span", null, "Zkusit to jinak od října 1988"));
@@ -906,6 +928,7 @@ function renderSoon() {
 }
 
 function pick(c) {
+  (st.path = st.path || []).push([st.node.slice(0, 2), val(c.t, st)]);
   if (c.flag) st.flags[c.flag] = true;
   if (c.flags) c.flags.forEach(f => st.flags[f] = true);
   if (c.rec) { st.records.push([val(c.rec[0], st), val(c.rec[1], st)]); drawRecords(true); }
