@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.4 system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Závazek 1988</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=Special+Elite&display=swap">
+<style>
+/* Layout: jeden úzký sloupec; nahoře scéna, pod ní průklep spisu, který o hráči vedou jiní. */
+:root {
+  --wall: #dde2da;
+  --ink: #1f2621;
+  --muted: #56615a;
+  --line: #b9c2b7;
+  --paper: #eeeef2;
+  --carbon: #34388a;
+  --stamp: #b3342b;
+  --btn: #e8ece5;
+  --btn-hover: #f4f6f2;
+  --display: "Special Elite", "Courier New", Courier, monospace;
+  --body: "Literata", Georgia, "Times New Roman", serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --wall: #1b211d; --ink: #dfe5de; --muted: #9aa69d; --line: #36413a;
+    --paper: #262a35; --carbon: #b6b9f2; --stamp: #e0675d;
+    --btn: #232a25; --btn-hover: #2c342e; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --wall: #1b211d; --ink: #dfe5de; --muted: #9aa69d; --line: #36413a;
+  --paper: #262a35; --carbon: #b6b9f2; --stamp: #e0675d;
+  --btn: #232a25; --btn-hover: #2c342e; color-scheme: dark;
+}
+body {
+  background: var(--wall); color: var(--ink);
+  font-family: var(--body); font-size: 17px; line-height: 1.65;
+}
+.wrap {
+  max-width: 660px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 64px;
+  display: flex; flex-direction: column; gap: 36px;
+}
+header { display: flex; flex-direction: column; gap: 6px; }
+.kicker { font-family: var(--display); font-size: 13px; letter-spacing: .12em; color: var(--muted); text-transform: uppercase; }
+h1 { font-family: var(--display); font-weight: 400; font-size: clamp(34px, 8vw, 52px); line-height: 1.05; margin: 0; text-wrap: balance; }
+.sub { color: var(--muted); font-style: italic; margin: 0; max-width: 60ch; }
+
+.scene { display: flex; flex-direction: column; gap: 18px; scroll-margin-top: 16px; }
+.where { font-family: var(--display); font-size: 14px; color: var(--muted); letter-spacing: .04em; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+.prose p { margin: 0 0 1em; max-width: 64ch; }
+.prose p:last-child { margin-bottom: 0; }
+.choices { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+.choice {
+  font: inherit; font-size: 16px; text-align: left; color: var(--ink);
+  background: var(--btn); border: 1px solid var(--line); border-radius: 3px;
+  padding: 12px 16px; cursor: pointer; display: flex; gap: 12px; align-items: baseline;
+  transition: background .15s, transform .15s;
+}
+.choice:hover { background: var(--btn-hover); transform: translateX(3px); }
+.choice:focus-visible { outline: 2px solid var(--carbon); outline-offset: 2px; }
+.choice .k { font-family: var(--display); color: var(--muted); flex: none; }
+
+.chapter { display: flex; flex-direction: column; gap: 14px; padding-block: 8px; }
+.chapter .num { font-family: var(--display); font-size: 14px; letter-spacing: .12em; color: var(--stamp); text-transform: uppercase; }
+.chapter h2 { font-family: var(--display); font-weight: 400; font-size: clamp(28px, 6vw, 38px); line-height: 1.1; margin: 0; text-wrap: balance; }
+
+.record {
+  background: var(--paper); color: var(--carbon);
+  font-family: var(--display); font-size: 15px; line-height: 1.55;
+  padding: 22px 20px 24px; position: relative;
+  box-shadow: 0 1px 0 var(--line), 0 6px 18px -12px rgba(0,0,0,.35);
+}
+.record h2 { font-family: var(--display); font-weight: 400; font-size: 14px; letter-spacing: .1em; margin: 0 0 12px; text-transform: uppercase; padding-right: 120px; }
+.record ol { margin: 0; padding-left: 1.6em; display: flex; flex-direction: column; gap: 10px; }
+.record .who { display: block; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; opacity: .7; }
+.record .empty { opacity: .65; margin: 0; }
+.stamp {
+  position: absolute; top: 14px; right: 14px; transform: rotate(-8deg);
+  color: var(--stamp); border: 2px solid var(--stamp); padding: 2px 8px;
+  font-family: var(--display); font-size: 13px; letter-spacing: .08em; opacity: .85;
+}
+.caret .t::after { content: "▌"; animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+.tools { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+.link { font: inherit; color: var(--muted); background: none; border: 0; padding: 0; text-decoration: underline; cursor: pointer; }
+.link:focus-visible { outline: 2px solid var(--carbon); outline-offset: 2px; }
+footer { font-size: 13px; color: var(--muted); }
+.fade { animation: fade .5s ease both; }
+@keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .fade, .caret .t::after { animation: none; }
+  .choice { transition: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <span class="kicker">Hratelné kapitoly 1–2 ze 6</span>
+    <h1>Závazek</h1>
+    <p class="sub">Michal, ročník 1970. Maturant, smečař v okresním volejbale. Táta mistr ve fabrice, ve straně „protože se to tak dělá“. Máma na poště. Nikdo z nich nikdy nic nepodepsal.</p>
+  </header>
+
+  <main class="scene" id="scene" aria-live="polite"></main>
+
+  <aside class="record" aria-label="Spis">
+    <span class="stamp">PŘÍSNĚ TAJNÉ</span>
+    <h2>Svazek č. 24-881 · Michal H.</h2>
+    <ol id="rec"></ol>
+    <p class="empty" id="recEmpty">Zatím prázdný. To se změní.</p>
+  </aside>
+
+  <div class="tools">
+    <button class="link" type="button" id="restart">Začít znovu od října 1988</button>
+  </div>
+  <footer>Neexistuje správná odpověď. Jen různé způsoby, jak tě to dožene. Všechny postavy a místa jsou smyšlené.</footer>
+</div>
+
+<script>
+/* ---------- pomocníci pro text ---------- */
+const F = st => st.flags;
+const went = st => F(st).podepsal || F(st).svejk;        // jel do Lince
+const martinInLinec = st => went(st) && !F(st).prozradil;
+
+/* ---------- příběh ---------- */
+const S = {
+  /* ===== KAPITOLA 1 ===== */
+  c1_title: { chapter: "Kapitola první", title: "Pohovor", lead: "Říjen 1988. Do listopadu 1989 zbývá třináct měsíců. To ale nikdo neví.", next: "c1_start" },
+
+  c1_start: {
+    where: "Říjen 1988 · gymnázium, ředitelna",
+    text: [
+      "Uprostřed hodiny fyziky pro tebe přijde zástupkyně. „Michale, do ředitelny. Vezmi si věci.“ Třída ztichne tak, jak tichne jen při písemce a při tomhle.",
+      "Ředitel v ředitelně není. Za jeho stolem sedí muž v hnědé koženkové bundě, před sebou desky a dvě kávy v hrnečcích s logem Jednoty.",
+      "„Nadporučík Koubek. Posaď se, Michale. Nic se neděje. Jen si popovídáme. Gratuluju k okresu, mimochodem. Ty smeče byly pěkný.“"
+    ],
+    choices: [
+      { t: "Posadit se a poděkovat za kávu.", to: "c1_turnaj", rec: ["npor. Koubek", "Jmenovaný se choval vstřícně, kávu přijal a vypil."] },
+      { t: "„Táta něco provedl?“", to: "c1_turnaj", rec: ["npor. Koubek", "Projevil nervozitu, ptal se na otce. Vazba na rodinu silná, lze využít."] },
+      { t: "„Já radši postojím, soudruhu.“", to: "c1_turnaj", rec: ["npor. Koubek", "Zpočátku zaujal odmítavý postoj. Kávu nevypil. Káva vypita mnou."] }
+    ]
+  },
+  c1_turnaj: {
+    where: "Ředitelna · o deset minut později",
+    text: [
+      "Koubek listuje deskami. „V dubnu jedete s družstvem na turnaj do Lince. Rakousko. To je pěkná věc, Michale. Spousta lidí se tam za celý život nepodívá.“ Usměje se. „Výjezdní doložky ještě nejsou podepsané. Ale to je formalita.“",
+      "Dvakrát poklepe tužkou o stůl. „Jede s vámi i Martin Holub. Nahrávač. Kamarád, ne? Martin má tetu v Mnichově. A prý se ve sprchách bavil, že by v Linci třeba zůstal. Nebo v létě přes Maďarsko. Víš o tom něco?“"
+    ],
+    choices: [
+      { t: "„Nevím o ničem.“", to: "c1_zavazek", rec: ["npor. Koubek", "Na přímé dotazy reagoval vyhýbavě. Pravděpodobně ví víc, než říká."] },
+      { t: "„Martin jezdí do Maďarska kvůli salámu. Říká, že u nás je horší.“", to: "c1_zavazek", rec: ["npor. Koubek", "Uvedl, že H. vyjadřuje nespokojenost se zásobováním (salám). Hodnoceno jako hanobení, ale nízké závažnosti."] },
+      { t: "„Jo, něco takového říkal. Ale myslím, že kecal.“", to: "c1_zavazek", flag: "prozradil", rec: ["npor. Koubek", "Potvrdil, že H. plánuje nedovolené opuštění republiky. Informace ověřená, cenná. H. vyřadit z výjezdu."] }
+    ]
+  },
+  c1_zavazek: {
+    where: "Ředitelna · káva už vystydla",
+    text: [
+      "Koubek zavře desky. „Víš, Michale, já nejsem žádný strašák. Nikoho nechci zavírat. Chci jen, aby se nikomu nic nestalo. Aby třeba Martin neudělal hloupost, kvůli které by pak jeho máma brečela.“",
+      "„A ty bys mi mohl pomoct. Nic velkého. Jednou za měsíc si sedneme na kafe a řekneš mi, co je nového v družstvu. Linec by pak byl jistý. A tvůj táta má jít na vedoucího provozu, to je taky hezká věc. Nikdo nechce, aby se něco pokazilo.“",
+      "Na stůl položí list papíru. Nahoře velkými písmeny stojí ZÁVAZEK."
+    ],
+    choices: [
+      { t: "Podepsat. Linec, táta, klid. Vždyť o nic nejde.", to: "c1_vecere", flag: "podepsal", rec: ["npor. Koubek", "Získán ke spolupráci. Krycí jméno SMEČAŘ. Motivace: výjezd do KS, rodinné ohledy."] },
+      { t: "„Nepodepíšu to.“", to: "c1_odmitnuti", flag: "odmitl", rec: ["npor. Koubek", "Spolupráci odmítl. Odůvodnění neuvedl."] },
+      { t: "„S radostí, soudruhu nadporučíku! A můžu hlásit i sousedku Kubíčkovou? Ta dává papír do popelnice na sklo.“", to: "c1_svejk", flag: "svejk", rec: ["npor. Koubek", "Ke spolupráci svolil s nepřiměřeným nadšením."] }
+    ]
+  },
+  c1_odmitnuti: {
+    where: "Ředitelna · u dveří",
+    text: [
+      "Koubek se nezlobí. To je horší, než kdyby se zlobil. „Jak chceš. Nikdo tě nenutí.“ Papír pečlivě složí a schová do desek.",
+      "„Jen o tomhle rozhovoru nikomu neříkej. Ani Martinovi. Kdyby se to rozkřiklo, lidi by si mohli myslet, žes podepsal. Víš, jak to chodí.“"
+    ],
+    choices: [
+      { t: "Na tréninku to Martinovi stejně říct.", to: "c1_vecere", flag: "rekl", rec: ["npor. Koubek", "Porušil mlčenlivost, informoval H. o pohovoru. Opatření: oslovit H."] },
+      { t: "Mlčet. Nikomu nic.", to: "c1_vecere", rec: ["npor. Koubek", "Pohovor ukončen bez výsledku. Ponechat v evidenci."] }
+    ]
+  },
+  c1_svejk: {
+    where: "Ředitelna · formality",
+    text: [
+      "Koubek se na tebe dlouho dívá. Snaží se poznat, jestli si z něj děláš legraci. Ty se tváříš jako nejšťastnější maturant v okrese.",
+      "„No… dobře,“ řekne nakonec. „Krycí jméno si můžeš vybrat.“",
+      "„SMEČAŘ,“ řekneš. A pak: „Nebo by šlo SOUDRUH SMEČAŘ? Aby bylo hned jasné, na čí straně stojím.“ Koubek napíše SMEČAŘ a tužku zlomí."
+    ],
+    choices: [
+      { t: "Poděkovat za důvěru a zeptat se, jestli dostaneš služební zápisník.", to: "c1_vecere", rec: ["npor. Koubek", "Krycí jméno SMEČAŘ. Požadoval služební zápisník. Nevydán."] }
+    ]
+  },
+  c1_vecere: {
+    where: "Týž den večer · kuchyň, panelák",
+    text: [
+      "Vepřo knedlo zelo. V televizi hlásí, že plán ve stavebnictví byl splněn na sto tři procenta. Táta odloží příbor.",
+      "„Volala mi Kubíčková. Prý tě dneska vytáhli z hodiny. Co chtěli?“ Máma přestane krájet knedlík."
+    ],
+    choices: [
+      { t: "Říct pravdu.", to: "c1_pravda", flag: "tata", rec: ["zdroj KUBÍČKOVÁ", "Otec po večeři zavíral okno, ačkoli bylo zavřené. Důvod neznámý."] },
+      { t: "„Kvůli volejbalu. Chtěli vědět, jestli jsme připravení na Linec.“", to: "c1_konec", rec: ["zdroj KUBÍČKOVÁ", "Rodina o pohovoru informována nebyla. Večeře proběhla v klidu. Knedlíky kupované."] },
+      { t: "„Pán se ptal, jestli doma dodržujeme pitný režim.“", to: "c1_konec", rec: ["zdroj KUBÍČKOVÁ", "Otec se dvakrát hlasitě zasmál. Pitný režim. Nejasné, prověřit."] }
+    ]
+  },
+  c1_pravda: {
+    where: "Kuchyň · o chvíli později",
+    text: [
+      st => F(st).podepsal ? "Táta dlouho mlčí. Pak vstane a jde zavřít okno, i když je zavřené. „Já jsem za celej život nic nepodepsal,“ řekne tiše. „A víš proč? Protože po mně nikdy nikdo nic nechtěl.“" : "",
+      st => F(st).podepsal ? "Máma umývá jeden talíř pořád dokola." : "",
+      st => F(st).odmitl ? "Táta odloží vidličku. „Takže vedoucí provozu nebudu.“ Neřekne to naštvaně, spíš jako předpověď počasí. Pak dodá: „Dobře jsi udělal.“ A po chvíli: „Doufám.“" : "",
+      st => F(st).odmitl ? "Máma jde zavolat babičce. U telefonu si to rozmyslí a zavěsí." : "",
+      st => F(st).svejk ? "Táta se nejdřív směje, pak přestane. „Ty sis z něj dělal legraci? Z estébáka?“ „Já to myslel vážně,“ řekneš. Táta už neví, čeho se bát víc." : ""
+    ],
+    choices: [
+      { t: "Dojíst a jít spát.", to: "c1_konec" }
+    ]
+  },
+  c1_konec: {
+    end: true, chapter: "Konec první kapitoly",
+    title: "Zima 1988",
+    lead: st => F(st).odmitl
+      ? "V lednu přijde ze školy dopis. Výjezdní doložka na turnaj do Lince nebyla schválena, bez udání důvodu. Trenér ti řekne, že je mu to líto, a nedívá se na tebe."
+      : (F(st).prozradil
+        ? "V lednu se dozvíš, že Martin do Lince nepojede. Doložku mu neschválili, bez udání důvodu. Martin to vezme sportovně. Asi."
+        : "V lednu přijdou schválené doložky. Tvoje i Martinova. Trenér rozdá seznam věcí s sebou. Na posledním řádku stojí: chovat se důstojně."),
+    next: "c2_title"
+  },
+
+  /* ===== KAPITOLA 2 ===== */
+  c2_title: { chapter: "Kapitola druhá", title: "Linec a hranice", lead: "Duben až srpen 1989. V Maďarsku začali stříhat plot. U nás o tom večerníky mlčí.", next: "c2_route" },
+  c2_route: { route: st => went(st) ? "c2_bus" : "c2_telocvicna" },
+
+  c2_bus: {
+    where: "Duben 1989 · autobus Karosa, hraniční přechod Dolní Dvořiště",
+    text: [
+      st => martinInLinec(st) ? "Martin sedí vedle tebe a celou cestu mluví o tom, co si koupí. Kazety. Džíny. Banány na pozdrav mámě." : "Místo vedle tebe zůstane prázdné. Na Martinovo místo nikoho nenominovali, protože o zrušené doložce se dozvěděli pozdě. Ty víš proč. Nebo si to aspoň myslíš.",
+      "Za hranicí se postaví vedoucí výpravy soudruh Pešek, který nikdy nehrál volejbal. „Pasy prosím ke mně. Kvůli bezpečnosti. Abyste je neztratili.“",
+      st => F(st).podepsal ? "Den předtím ti Koubek v kavárně Moskva řekl: „Užij si to. A dívej se kolem. Hlavně na Holuba.“" : "",
+      st => F(st).svejk ? "Den předtím ti Koubek v kavárně Moskva řekl: „Užij si to. A prosím tě, žádné hlášení o počasí.“" : ""
+    ],
+    choices: [
+      { t: "Odevzdat pas bez řečí.", to: "c2_obchod", rec: ["vedoucí výpravy Pešek", "Hráči odevzdali pasy bez námitek. Kázeň dobrá."] },
+      { t: "„A dostaneme je zpátky?“", to: "c2_obchod", rec: ["vedoucí výpravy Pešek", "Hráč H. Michal se ptal, zda pasy vrátím. Otázku považuji za provokativní."] },
+      { t: "Odevzdat pas a nabídnout Peškovi, že mu bude hlídat i pasy ostatních.", to: "c2_obchod", if: st => F(st).svejk, rec: ["vedoucí výpravy Pešek", "Hráč H. Michal nabídl spolupráci při ostraze dokladů. Odmítnuto. Hráč se vnucuje. Zjistit proč."] }
+    ]
+  },
+  c2_obchod: {
+    where: "Linec · samoobsluha u hotelu",
+    text: [
+      "Je to samoobsluha, jako u nás Jednota. Jen má jedenáct druhů jogurtu, banány leží na hromadě a nikdo na ně nestojí frontu. Nějaká paní je dokonce nechá ležet a jde pryč.",
+      "Máš 300 šilinků od svazu a 50 marek, které ti na cestu potají dala babička.",
+      st => martinInLinec(st) ? "Martin stojí před regálem s kazetami a vypadá, jako by se modlil." : "Prodavačka se na tebe usměje, jako by tu nebylo nic zvláštního. Pro ni nejsi zvláštní ty. Tohle je možná ta nejdivnější věc za celý den."
+    ],
+    choices: [
+      { t: "Koupit mámě kávu Jacobs a tátovi plechovku piva.", to: "c2_noc_route", rec: ["vedoucí výpravy Pešek", "H. Michal nakoupil potraviny. Chování spotřebitelské, nikoli však provokativní."] },
+      { t: "Koupit si walkman a zbytek dní hladovět.", to: "c2_noc_route", rec: ["vedoucí výpravy Pešek", "H. Michal zakoupil přehrávač značky Sony. Podezření na šíření západní hudby. Zjistit, jaké kazety."] },
+      { t: "Nekoupit nic. Jen tam stát a dívat se.", to: "c2_noc_route", rec: ["vedoucí výpravy Pešek", "H. Michal v prodejně nic nezakoupil. Chování ukázněné, avšak podivné."] }
+    ]
+  },
+  c2_noc_route: { route: st => martinInLinec(st) ? "c2_noc_martin" : "c2_noc_sam" },
+  c2_noc_martin: {
+    where: "Hotel Zum Goldenen Hirschen · pokoj 14, po půlnoci",
+    text: [
+      "Martin leží na posteli a dívá se do stropu. „Tady ne,“ řekne najednou. „Kdybych zůstal tady, Pešek by to odnesl a celej oddíl taky. A táta by přišel o místo.“",
+      "Otočí se k tobě. „V srpnu jedeme se ségrou k Balatonu. Pak do kempu u Šoproně. Říká se, že Maďaři v plotě dělají díry a nikdo je nehlídá. Jeď s náma.“",
+      st => F(st).podepsal ? "V hlavě slyšíš Koubka: Hlavně na Holuba." : "",
+      st => F(st).svejk ? "Napadne tě, že tohle do hlášení o počasí rozhodně nepatří." : ""
+    ],
+    choices: [
+      { t: "„Jedu.“", to: "c2_hlaseni_route", flag: "chceJet" },
+      { t: "„Nevím. Musím to promyslet.“", to: "c2_hlaseni_route", flag: "vahal" },
+      { t: "„Ne. A radši mi to vůbec neříkej.“", to: "c2_hlaseni_route", flag: "nechtel" }
+    ]
+  },
+  c2_noc_sam: {
+    where: "Hotel Zum Goldenen Hirschen · pokoj 14, po půlnoci",
+    text: [
+      "Pokoj máš sám. Pešek ti ho přidělil s poznámkou, že je to „výhoda“.",
+      "Z okna je vidět osvětlená ulice a na rohu policejní stanice. Normální rakouská policie. Kdybys teď sešel dolů a přešel ulici, nikdo by tě nezastavil. Pas sice má Pešek, ale prý to jde i bez něj. Ráno by byl autobus o jednoho lehčí.",
+      "Myslíš na tátu. Na to, že kdybys tu zůstal, tátu jako vedoucího provozu odvolají dřív, než ho jmenují."
+    ],
+    choices: [
+      { t: "Sejít dolů a přejít ulici.", to: "c2_azyl", flag: "emigroval", rec: ["vedoucí výpravy Pešek", "Ráno zjištěna nepřítomnost hráče H. Michala. Hlásím nedovolené opuštění republiky. Pas zůstal u mne, tudíž za ztrátu dokladu neodpovídám."] },
+      { t: "Zatáhnout závěs a jít spát.", to: "c2_hlaseni_route" }
+    ]
+  },
+  c2_azyl: {
+    where: "Linec · policejní stanice, 2:40 ráno",
+    text: [
+      "Policista v noční službě je mladší než ty. Vůbec nevypadá překvapeně. Uvaří ti čaj z pytlíku a podá formulář v pěti jazycích. Čeština mezi nimi není, slovenština ano.",
+      "V kolonce Důvod žádosti dlouho nic nenapíšeš. Pak napíšeš: Banány. Policista se nesměje. Asi to tu viděl už mnohokrát."
+    ],
+    choices: [
+      { t: "Podepsat formulář. Druhý podpis za půl roku.", to: "c2_konec", rec: ["npor. Koubek", st => F(st).podepsal || F(st).svejk ? "Agent SMEČAŘ emigroval. Spolupráci ukončit. Hodnocení: nespolehlivý. Okolnosti nahlásit nadřízeným jako nepředvídatelné." : "Jmenovaný emigroval. Rodinu prověřit."] }
+    ]
+  },
+  c2_hlaseni_route: { route: st => martinInLinec(st) ? "c2_hlaseni" : (went(st) ? "c2_hlaseni_sam" : "c2_srpen_route") },
+  c2_hlaseni: {
+    where: "Květen 1989 · kavárna Moskva, stolek u okna",
+    text: [
+      "Koubek si objedná dva turky a jeden větrník. Větrník sní sám. „Tak co Holub? Choval se v Linci slušně?“",
+      st => F(st).chceJet ? "Myslíš na to, že jsi Martinovi řekl „jedu“. Teď sedíš tady." : "",
+      st => F(st).svejk ? "V tašce máš připravené hlášení na jedenácti stranách. Jogurty jsou v něm seřazené podle tučnosti." : ""
+    ],
+    choices: [
+      { t: "„Mluvil o Maďarsku. Asi to myslí vážně.“", to: "c2_srpen_route", flag: "hlasil", rec: ["npor. Koubek", "Agent SMEČAŘ potvrdil úmysl H. Martina opustit republiku přes MLR. Opatření: odebrat H. vkládací list, znemožnit výjezd."] },
+      { t: "„Choval se vzorně. Koupil si kazety.“", to: "c2_srpen_route", rec: ["npor. Koubek", "Agent SMEČAŘ uvádí, že se H. choval vzorně. Zpráva vedoucího výpravy uvádí totéž. Podezřele shodné."] },
+      { t: "Předat jedenáct stran o jogurtech a o tom, že Pešek chrápe.", to: "c2_srpen_route", if: st => F(st).svejk, rec: ["npor. Koubek", "Agent SMEČAŘ předal zprávu o 11 stranách. Obsah: jogurty, chrápání s. Peška (ověřit u jiného zdroje). O H. pouze: „Nahrává dobře.“"] }
+    ]
+  },
+  c2_hlaseni_sam: {
+    where: "Květen 1989 · kavárna Moskva, stolek u okna",
+    text: [
+      "Koubek si objedná dva turky a jeden větrník. Větrník sní sám. „Tak co Linec? Líbilo se?“",
+      "„Měli tam jedenáct druhů jogurtu,“ řekneš. Koubek si to poctivě zapíše. Pak se zarazí a přeškrtne to."
+    ],
+    choices: [
+      { t: "Dopít kávu a jít.", to: "c2_srpen_route", rec: ["npor. Koubek", "Agent SMEČAŘ z výjezdu nepřinesl operativně zajímavé poznatky. Uvádí jogurty."] }
+    ]
+  },
+
+  c2_telocvicna: {
+    where: "Duben 1989 · tělocvična okresního oddílu",
+    text: [
+      st => F(st).prozradil
+        ? "Do Lince nejel nikdo z vás dvou. Martin tvrdí, že je mu to jedno. Při rozcvičce ti poprvé za deset let nahraje špatně. Asi náhoda."
+        : "Martin se vrátil z Lince s plnou taškou. Hodí ti čokoládu s fialovou krávou. „Na. Aby ti to nebylo líto.“ Je ti to líto.",
+      st => F(st).rekl ? "Po tréninku se zdrží v šatně. „Víš, že mě taky volali? Týden po tobě. Ten v hnědý bundě.“ Nedívá se na tebe. „Odmít jsem to. Jasně že jo.“" : "",
+      "Pak se ztiší. „V srpnu jedu se ségrou k Balatonu. A pak do kempu u Šoproně. Říká se, že Maďaři v plotě dělají díry. Jeď s náma.“"
+    ],
+    choices: [
+      { t: "„Jedu.“", to: "c2_srpen_route", flag: "chceJet" },
+      { t: "„Nevím. Musím to promyslet.“", to: "c2_srpen_route", flag: "vahal" },
+      { t: "„Ne. A radši mi to vůbec neříkej.“", to: "c2_srpen_route", flag: "nechtel" }
+    ]
+  },
+
+  c2_srpen_route: { route: st => {
+    if (F(st).emigroval) return "c2_konec";
+    if (F(st).hlasil || F(st).prozradil) return "c2_srpen_hlasil";
+    if (F(st).nechtel) return "c2_srpen_doma";
+    return "c2_srpen_kemp";
+  }},
+  c2_srpen_hlasil: {
+    where: "Srpen 1989 · lavička před panelákem",
+    text: [
+      "Martin nikam nejel. Na pasovém mu vzali vkládací list do občanky a nikdo mu neřekl proč.",
+      "Sedí vedle tebe na lavičce a kouří, i když nekouří. „Někdo to na mě řekl,“ řekne. „Věděli to jen tři lidi. Ségra, já a ty.“",
+      "Ze třetího patra se dívá paní Kubíčková. Martin to nevidí."
+    ],
+    choices: [
+      { t: "Přiznat se.", to: "c2_konec", flag: "priznal", rec: ["zdroj KUBÍČKOVÁ", "Před domem rozhovor dvou mladíků. Jeden plakal. Nerozuměla jsem. Druhý pak odešel."] },
+      { t: "„Myslíš, že ségra?“", to: "c2_konec", flag: "zapiral", rec: ["zdroj KUBÍČKOVÁ", "Před domem rozhovor dvou mladíků o sestře jednoho z nich. Nerozuměla jsem."] },
+      { t: "Mlčet. Ukázat nahoru na Kubíčkovou.", to: "c2_konec", flag: "kubickova", rec: ["zdroj KUBÍČKOVÁ", "Mladíci před domem ukazovali do mého okna. Žádám o ochranu."] }
+    ]
+  },
+  c2_srpen_doma: {
+    where: "Srpen 1989 · byt, sobota ráno",
+    text: [
+      "Martin odjel k Balatonu. Ty jsi doma a pomáháš tátovi tapetovat chodbu. Tapeta má vzor, kterému máma říká „rakouský“, protože ji sehnala přes známou z Tuzexu.",
+      "V rádiu na Svobodné Evropě, které táta ztlumí pokaždé, když jde někdo po schodech, mluví o tisících Němců z NDR, kteří čekají v Maďarsku. Táta řekne: „Blázni.“ A pak ztlumí rádio, i když nikdo nejde."
+    ],
+    choices: [
+      { t: "Tapetovat dál.", to: "c2_konec", flag: "zustal", rec: ["zdroj KUBÍČKOVÁ", "U H. se v sobotu tapetovalo. Rádio hrálo tiše. Podezřele tiše."] }
+    ]
+  },
+  c2_srpen_kemp: {
+    where: "19. srpna 1989 · kemp u Šoproně, večer",
+    text: [
+      "V kempu jsou samí Němci z NDR. Spí v trabantech, které tu stejně nechají. Jeden ti daruje celý kanystr benzínu, protože ho už nebude potřebovat.",
+      "Odpoledne se rozneslo, že u hranice je nějaký piknik a stovky lidí prošly do Rakouska přes otevřenou bránu. Večer už je brána zase zavřená. Martin ale našel místo, kde je v plotě díra a stráž tam chodí jen jednou za hodinu.",
+      "Je půl jedenácté. Martinova sestra si balí věci do igelitky, aby to nevypadalo jako zavazadlo. „Ve čtyři ráno,“ řekne Martin. „Jdeš?“"
+    ],
+    choices: [
+      { t: "Jít s nimi.", to: "c2_hranice", flag: "emigroval", rec: ["npor. Koubek", st => (F(st).podepsal || F(st).svejk) ? "Agent SMEČAŘ a H. Martin nedovoleně opustili republiku přes MLR. Agent nepředal žádnou předběžnou informaci. Prověřit, zda nebyl od počátku dvojitý." : "H. Michal a H. Martin nedovoleně opustili republiku. Zahájit trestní stíhání v nepřítomnosti."] },
+      { t: "Ve čtyři ráno předstírat, že spíš.", to: "c2_rano", rec: ["npor. Koubek", "H. Martin nedovoleně opustil republiku přes MLR. H. Michal se vrátil sám. Vyslechnout."] },
+      { t: "„Martine, počkej do zimy. Něco se děje, cítím to.“", to: "c2_rano_oba", rec: ["npor. Koubek", "H. Michal i H. Martin se z MLR vrátili. Dle zdroje se H. Michal vyjadřoval, že „se něco děje“. Nejasné. Prověřit, co ví."] }
+    ]
+  },
+  c2_hranice: {
+    where: "20. srpna 1989 · 4:10 ráno, kukuřičné pole",
+    text: [
+      "Jdete kukuřicí. Martinova sestra nese igelitku, ty kanystr, který ti daroval ten Němec, protože ho nebylo kam dát. Plot je nižší, než sis myslel. Díra je přesně tam, kde měla být.",
+      "Na druhé straně stojí rakouský sedlák s traktorem, jako by tam stál každé ráno. Řekne vám něco, čemu nerozumíte, a ukáže na vlečku.",
+      "Až na vlečce si uvědomíš, že pořád neseš ten kanystr."
+    ],
+    choices: [
+      { t: "Dát kanystr sedlákovi.", to: "c2_konec" }
+    ]
+  },
+  c2_rano: {
+    where: "20. srpna 1989 · kemp, sedm ráno",
+    text: [
+      "Stan vedle je prázdný. Na tvém spacáku leží Martinova kazeta, kterou si koupil v Linci, a lístek: Byla to dobrá nahrávka.",
+      "Zpátky jedeš vlakem sám. Na hranici tě vytáhnou z kupé a ptají se, kde je kamarád. Říkáš, že nevíš. Je to skoro pravda."
+    ],
+    choices: [
+      { t: "Jet domů.", to: "c2_konec", flag: "zustal" }
+    ]
+  },
+  c2_rano_oba: {
+    where: "20. srpna 1989 · kemp, sedm ráno",
+    text: [
+      "Martin se na tebe celou noc zlobil. Ráno ale balí stan. „Do zimy,“ řekne. „Jestli se do zimy nic nestane, jdu. A ty se mnou.“",
+      "Cestou domů se jeho sestra ptá, co se jako má dít. Nevíš. Řekl jsi to jen proto, abys nemusel jít."
+    ],
+    choices: [
+      { t: "Jet domů.", to: "c2_konec", flags: ["zustal", "martinZustal"] }
+    ]
+  },
+
+  c2_konec: {
+    end: true, chapter: "Konec druhé kapitoly",
+    title: "Podzim 1989",
+    lead: st => {
+      const f = F(st);
+      if (f.emigroval) return "Uprchlický tábor v Traiskirchenu. Dostaneš postel, pět set šilinků kapesného a pohlednici domů, kterou nepošleš, protože by ji přečetli dřív než máma. V listopadu tu jen tak tak chytíš československou televizi.";
+      if (f.priznal) return "Martin s tebou od srpna nepromluvil. Ve škole ho vidíš na chodbě, jak se dívá skrz tebe. Koubek ti v září řekne: „Vidíš? Nikomu se nic nestalo.“";
+      if (f.zapiral) return "Martin se kvůli tobě pohádal se sestrou. Nemluví spolu dodnes. Tedy do listopadu. Ty mezitím nosíš Koubkovi hlášení a v noci špatně spíš.";
+      if (f.kubickova) return "Martin od té doby zdraví paní Kubíčkovou tak hlasitě, že to slyší celý panelák. Ona se odstěhuje k dceři. Ty víš, že to nebyla ona. Martin ne.";
+      if (f.martinZustal) return "Martin čeká na zimu. V listopadu se opravdu něco stane. Martin pak celé roky tvrdí, že jsi to věděl. Ty to nevyvracíš.";
+      if (f.zustal) return "Na podzim je ve škole klid. Až příliš velký klid. Ve třídě je o dva lidi míň, nikdo o tom nemluví a třídní je v třídnici přeškrtne pravítkem.";
+      return "Podzim přijde jako každý rok.";
+    },
+    next: "c3_soon"
+  },
+
+  c3_soon: { soon: true }
+};
+
+/* ---------- engine ---------- */
+const $scene = document.getElementById("scene");
+const $rec = document.getElementById("rec");
+const $empty = document.getElementById("recEmpty");
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const KEY = "zavazek-save-v2";
+let st, typing = null;
+
+const val = (v, s) => typeof v === "function" ? v(s) : v;
+function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
+function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); return s && S[s.node] ? s : null; } catch (e) { return null; } }
+
+function fresh() { return { node: "c1_title", flags: {}, records: [] }; }
+
+function drawRecords(animateLast) {
+  $rec.innerHTML = "";
+  $empty.hidden = st.records.length > 0;
+  st.records.forEach(([who, text], i) => {
+    const li = el("li");
+    const w = el("span", "who", who); const t = el("span", "t");
+    li.append(w, t); $rec.appendChild(li);
+    const last = animateLast && i === st.records.length - 1 && !reduce;
+    if (!last) { t.textContent = text; return; }
+    li.className = "caret"; let k = 0; clearInterval(typing);
+    typing = setInterval(() => {
+      k += 2; t.textContent = text.slice(0, k);
+      if (k >= text.length) { clearInterval(typing); li.className = ""; }
+    }, 18);
+  });
+}
+
+function go(node) {
+  let n = S[node];
+  while (n && n.route) { node = n.route(st); n = S[node]; }
+  st.node = node; save(); render();
+}
+
+function render() {
+  $scene.innerHTML = "";
+  const n = S[st.node];
+  if (n.soon) return renderSoon();
+  if (n.chapter) return renderCard(n);
+  $scene.appendChild(el("div", "where", val(n.where, st)));
+  const prose = el("div", "prose fade");
+  n.text.map(p => val(p, st)).filter(Boolean).forEach(p => prose.appendChild(el("p", null, p)));
+  $scene.appendChild(prose);
+  const ch = el("div", "choices fade");
+  n.choices.filter(c => !c.if || c.if(st)).forEach((c, i) => {
+    const b = el("button", "choice"); b.type = "button"; b.id = "c-" + st.node + "-" + i;
+    b.append(el("span", "k", String.fromCharCode(97 + i) + ")"), el("span", null, c.t));
+    b.addEventListener("click", () => pick(c));
+    ch.appendChild(b);
+  });
+  $scene.appendChild(ch);
+}
+
+function renderCard(n) {
+  const box = el("div", "chapter fade");
+  box.append(el("span", "num", n.chapter), el("h2", null, val(n.title, st)));
+  const p = el("div", "prose"); p.appendChild(el("p", null, val(n.lead, st))); box.appendChild(p);
+  const b = el("button", "choice"); b.type = "button"; b.id = "next-" + st.node;
+  b.append(el("span", "k", "→"), el("span", null, n.end ? "Pokračovat" : "Začít"));
+  b.addEventListener("click", () => { go(n.next); scrollUp(); });
+  box.appendChild(b);
+  $scene.appendChild(box);
+}
+
+function renderSoon() {
+  const box = el("div", "chapter fade");
+  box.append(el("span", "num", "Kapitola třetí"), el("h2", null, "Náměstí"));
+  const p = el("div", "prose");
+  const f = st.flags;
+  const line = f.emigroval
+    ? "Listopad 1989 uvidíš v televizi v uprchlickém táboře. Lidé kolem tebe cinkají klíči a ty nevíš, jestli jsi právě vyhrál, nebo prohrál."
+    : (f.odmitl
+      ? "Na podzim nastoupíš na vojnu. V listopadu vám velitel řekne, ať se připravíte na zásah proti „výtržníkům“ v Praze."
+      : "V listopadu budeš stát na náměstí a cinkat klíči. Vedle lidí, o kterých jsi psal. Nebo o kterých jsi nepsal, ale v tom spisu to tak nevypadá.");
+  p.append(el("p", null, line), el("p", null, "Tahle kapitola se teprve píše. Tvoje rozhodnutí si hra pamatuje."));
+  box.appendChild(p);
+  const b = el("button", "choice"); b.type = "button"; b.id = "again";
+  b.append(el("span", "k", "↺"), el("span", null, "Zkusit to jinak od října 1988"));
+  b.addEventListener("click", restart);
+  box.appendChild(b);
+  $scene.appendChild(box);
+}
+
+function pick(c) {
+  if (c.flag) st.flags[c.flag] = true;
+  if (c.flags) c.flags.forEach(f => st.flags[f] = true);
+  if (c.rec) { st.records.push([val(c.rec[0], st), val(c.rec[1], st)]); drawRecords(true); }
+  go(c.to); scrollUp();
+}
+
+function scrollUp() { $scene.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" }); }
+
+function restart() { clearInterval(typing); st = fresh(); save(); drawRecords(false); render(); scrollUp(); }
+document.getElementById("restart").addEventListener("click", restart);
+
+st = load() || fresh();
+drawRecords(false);
+render();
+</script>
+</body>
+</html>
