@@ -104,7 +104,7 @@ footer { font-size: 13px; color: var(--muted); }
 
 <div class="wrap">
   <header>
-    <span class="kicker">Hratelné kapitoly 1–2 ze 6</span>
+    <span class="kicker">Hratelné kapitoly 1–3 ze 6</span>
     <h1>Závazek</h1>
     <p class="sub">Michal, ročník 1970. Maturant, smečař v okresním volejbale. Táta mistr ve fabrice, ve straně „protože se to tak dělá“. Máma na poště. Nikdo z nich nikdy nic nepodepsal.</p>
   </header>
@@ -366,7 +366,7 @@ const S = {
       "V rádiu na Svobodné Evropě, které táta ztlumí pokaždé, když jde někdo po schodech, mluví o tisících Němců z NDR, kteří čekají v Maďarsku. Táta řekne: „Blázni.“ A pak ztlumí rádio, i když nikdo nejde."
     ],
     choices: [
-      { t: "Tapetovat dál.", to: "c2_konec", flag: "zustal", rec: ["zdroj KUBÍČKOVÁ", "U H. se v sobotu tapetovalo. Rádio hrálo tiše. Podezřele tiše."] }
+      { t: "Tapetovat dál.", to: "c2_konec", flags: ["zustal", "martinUtekl"], rec: ["zdroj KUBÍČKOVÁ", "U H. se v sobotu tapetovalo. Rádio hrálo tiše. Podezřele tiše."] }
     ]
   },
   c2_srpen_kemp: {
@@ -377,7 +377,7 @@ const S = {
       "Je půl jedenácté. Martinova sestra si balí věci do igelitky, aby to nevypadalo jako zavazadlo. „Ve čtyři ráno,“ řekne Martin. „Jdeš?“"
     ],
     choices: [
-      { t: "Jít s nimi.", to: "c2_hranice", flag: "emigroval", rec: ["npor. Koubek", st => (F(st).podepsal || F(st).svejk) ? "Agent SMEČAŘ a H. Martin nedovoleně opustili republiku přes MLR. Agent nepředal žádnou předběžnou informaci. Prověřit, zda nebyl od počátku dvojitý." : "H. Michal a H. Martin nedovoleně opustili republiku. Zahájit trestní stíhání v nepřítomnosti."] },
+      { t: "Jít s nimi.", to: "c2_hranice", flags: ["emigroval", "martinUtekl", "sMartinem"], rec: ["npor. Koubek", st => (F(st).podepsal || F(st).svejk) ? "Agent SMEČAŘ a H. Martin nedovoleně opustili republiku přes MLR. Agent nepředal žádnou předběžnou informaci. Prověřit, zda nebyl od počátku dvojitý." : "H. Michal a H. Martin nedovoleně opustili republiku. Zahájit trestní stíhání v nepřítomnosti."] },
       { t: "Ve čtyři ráno předstírat, že spíš.", to: "c2_rano", rec: ["npor. Koubek", "H. Martin nedovoleně opustil republiku přes MLR. H. Michal se vrátil sám. Vyslechnout."] },
       { t: "„Martine, počkej do zimy. Něco se děje, cítím to.“", to: "c2_rano_oba", rec: ["npor. Koubek", "H. Michal i H. Martin se z MLR vrátili. Dle zdroje se H. Michal vyjadřoval, že „se něco děje“. Nejasné. Prověřit, co ví."] }
     ]
@@ -400,7 +400,7 @@ const S = {
       "Zpátky jedeš vlakem sám. Na hranici tě vytáhnou z kupé a ptají se, kde je kamarád. Říkáš, že nevíš. Je to skoro pravda."
     ],
     choices: [
-      { t: "Jet domů.", to: "c2_konec", flag: "zustal" }
+      { t: "Jet domů.", to: "c2_konec", flags: ["zustal", "martinUtekl"] }
     ]
   },
   c2_rano_oba: {
@@ -427,10 +427,163 @@ const S = {
       if (f.zustal) return "Na podzim je ve škole klid. Až příliš velký klid. Ve třídě je o dva lidi míň, nikdo o tom nemluví a třídní je v třídnici přeškrtne pravítkem.";
       return "Podzim přijde jako každý rok.";
     },
-    next: "c3_soon"
+    next: "c3_title"
   },
 
-  c3_soon: { soon: true }
+  /* ===== KAPITOLA 3 ===== */
+  c3_title: { chapter: "Kapitola třetí", title: "Náměstí", lead: "Listopad 1989. Všechno, co dvacet let platilo, přestane platit za deset dní. A všichni budou tvrdit, že to věděli.", next: "c3_route" },
+  c3_route: { route: st => F(st).emigroval ? "c3_tabor" : (F(st).odmitl ? "c3_vojna" : "c3_kolej") },
+
+  /* --- větev: student v Praze (podepsal / švejk) --- */
+  c3_kolej: {
+    where: "17. listopadu 1989 · kolej na Strahově, pokoj 512",
+    text: [
+      "Na práva tě vzali. Nikdo se nedivil a nikdo se neptal proč. Koubek ti k nástupu poslal blahopřání se smrkem, i když byl září.",
+      "Spolubydlící Petr si obouvá pohorky. „Na Albertově je pietní akce. Povolená. Za Jana Opletala. Jdeš?“",
+      st => F(st).podepsal ? "Minulý týden ti Koubek řekl: „Kdyby se něco dělo, dívej se, kdo mluví. A kdo stojí vedle toho, kdo mluví.“" : "",
+      st => F(st).svejk ? "Minulý týden ti Koubek řekl: „Prosím tě, kdyby se něco dělo, tentokrát nikam nechoď. Já to pak musím číst.“" : ""
+    ],
+    choices: [
+      { t: "Obout se taky.", to: "c3_narodni", flag: "narodni" },
+      { t: "Zůstat a učit se římské právo.", to: "c3_kolej_noc" }
+    ]
+  },
+  c3_narodni: {
+    where: "17. listopadu 1989 · Národní třída, kolem osmé večer",
+    text: [
+      "Z Albertova se šlo na Vyšehrad a pak k Národnímu divadlu, i když tam nikdo nepozval. Teď stojíte v zúženém prostoru mezi kordóny. Vepředu bílé přilby, vzadu taky bílé přilby.",
+      "Holka vedle tebe postaví na zem svíčku, jako by to byl hrob. Pak si sedne. Pak si sedne i Petr. Někdo začne skandovat, že máte holé ruce.",
+      st => F(st).podepsal ? "Napadne tě, že máš v kapse krycí jméno, ale žádnou legitimaci. Tady tě nikdo nepozná. To je zvláštně uklidňující a zvláštně hrozné zároveň." : ""
+    ],
+    choices: [
+      { t: "Sednout si k Petrovi.", to: "c3_stavka", flag: "bity", rec: ["npor. Koubek", st => F(st).podepsal || F(st).svejk ? "Agent SMEČAŘ se akce na Národní třídě zúčastnil. Zprávu nepodal. Dle lékařské zprávy zlomený prst pravé ruky. Spolupráci tím nepovažuji za narušenou." : "H. Michal na Národní třídě. Zraněn."] },
+      { t: "Protáhnout se podloubím pryč, dokud to jde.", to: "c3_stavka", flag: "utekl17", rec: ["npor. Koubek", "Agent SMEČAŘ akci opustil včas. Hodnotím jako ukázněnost."] },
+      { t: "Jít ke kordónu a vysvětlit, že ty jsi vlastně od nich.", to: "c3_stavka", flags: ["bity", "kordon"], if: st => F(st).podepsal || F(st).svejk, rec: ["VB, pořádkový útvar", "Osoba se u kordónu dovolávala příslušnosti k StB. Prokázat se nemohla. Zakročeno obušky, jako u ostatních."] }
+    ]
+  },
+  c3_kolej_noc: {
+    where: "17. listopadu 1989 · kolej, půl dvanácté v noci",
+    text: [
+      "Římské právo ti nejde do hlavy. Pořád čteš tu samou větu o tom, kdo je svobodný člověk.",
+      "V půl dvanácté se vrátí Petr. Má roztrženou bundu, zakrvácené obočí a v ruce pořád drží nedopalek svíčky. Sedne si na postel a dlouho nic neříká. Pak se zeptá: „Kde jsi byl?“"
+    ],
+    choices: [
+      { t: "„Tady.“", to: "c3_stavka", rec: ["npor. Koubek", "Agent SMEČAŘ se akce nezúčastnil. Zprávu tedy nepodal. Logické, ale neužitečné."] }
+    ]
+  },
+  c3_stavka: {
+    where: "20. listopadu 1989 · obsazená fakulta, posluchárna 38",
+    text: [
+      "Fakulta stávkuje. V posluchárně se spí na lavicích, kopírka jede dnem i nocí a nikdo neví, kdo ji vlastně smí používat.",
+      st => F(st).bity ? "Prst máš v dlaze. Psát nemůžeš, a tak tě ostatní považují za hrdinu. Opravovat je nebudeš." : "",
+      st => F(st).martinZustal ? "Odpoledne se mezi dveřmi objeví Martin s trikolórou přes rameno. „Říkals do zimy,“ zakřičí přes celou posluchárnu. „Je zima!“" : "",
+      "Petr ti podá blok. „Potřebujeme seznam hlídek u vchodu. Kdo, kdy, kontakt. Ty máš hezký písmo.“",
+      "Večer tě vrátný zavolá k telefonu. „Nějakej strejda.“ Na drátě je Koubek. „Michale. Ten seznam hlídek. Potřeboval bych ho. Jen pro jistotu. Aby se nikomu nic nestalo.“"
+    ],
+    choices: [
+      { t: "Diktovat mu jména.", to: "c3_generalka", flag: "dalSeznam", rec: ["npor. Koubek", "Agent SMEČAŘ předal seznam stávkové hlídky (14 osob). Cenné. Pozn.: dějí se věci, nevím komu to předat."] },
+      { t: "Nadiktovat mu postavy z Babičky: Barunka, Viktorka, pan otec, myslivec.", to: "c3_generalka", flag: "babicka", rec: ["npor. Koubek", "Agent SMEČAŘ předal seznam hlídky: Proškovi, Viktorka (bez příjmení), myslivec. Prověřit. Zjištěno: Němcová, B., 1855. Informace o hlídce nepravdivá."] },
+      { t: "Zavěsit, vrátit se do posluchárny a říct to nahlas.", to: "c3_priznani", flag: "priznalVerejne", rec: ["npor. Koubek", "Agent SMEČAŘ se veřejně dekonspiroval. Ve stávajících podmínkách nelze řešit."] },
+      { t: "„Soudruhu, mám pro vás lepší seznam. Všichni členové ÚV. Ti se teď chovají podezřele.“", to: "c3_generalka", if: st => F(st).svejk, flag: "seznamUV", rec: ["npor. Koubek", "Agent SMEČAŘ předal seznam členů ÚV KSČ jako podezřelých osob. Odeslal jsem výš. Nikdo neodpověděl."] }
+    ]
+  },
+  c3_priznani: {
+    where: "20. listopadu 1989 · posluchárna 38, deset večer",
+    text: [
+      "Postavíš se na lavici, protože jinak by tě přes kopírku nikdo neslyšel. „Volal mi estébák. Chce seznam hlídek. Podepsal jsem jim to loni v říjnu.“",
+      "Kopírka se zastaví sama, jako by poslouchala. Nikdo nic neříká. Pak vstane holka z druhého ročníku, kterou neznáš jménem. „A dal jsi mu ho?“ „Ne.“ „Tak piš dál.“",
+      "Petr s tebou ten večer nepromluví. Ráno ti ale přinese čaj a položí ho na tvou lavici trochu dál od sebe, než by musel."
+    ],
+    choices: [
+      { t: "Psát dál.", to: "c3_generalka" }
+    ]
+  },
+  c3_generalka: {
+    where: "27. listopadu 1989 · dvůr fabriky, poledne",
+    text: [
+      "Na generální stávku jsi jel domů. Táta tě o to poprosil, což neudělal nikdy předtím.",
+      "Na dvoře stojí celá fabrika. Houkají sirény, zvoní tramvaje, a pak je ticho. Do ticha někdo zezadu zakřičí: „A co mistr H.? Ten byl ve straně dvacet let! Ať jde pryč!“",
+      "Táta zbledne. Nikdy nic nepodepsal. Jen platil příspěvky a chodil na schůze, protože se to tak dělalo. Stejně jako ten, kdo teď křičí.",
+      st => F(st).tata && (F(st).podepsal || F(st).svejk) ? "Táta se na tebe podívá. Ví to. Ty víš, že to ví." : ""
+    ],
+    choices: [
+      { t: "Zakřičet: „Táta nikdy nic nepodepsal!“", to: "c3_konec", flag: "zastalSe", rec: ["zdroj KUBÍČKOVÁ", "Syn mistra H. křičel, že otec nic nepodepsal. Dle mých poznatků je to pravda. O synovi to říct nemohu."] },
+      { t: "Mlčet a dívat se na boty.", to: "c3_konec", flag: "mlcelFabrika" },
+      { t: "Vystoupit dopředu: „Já jsem byl agent StB. Křičte na mě, ne na něj.“", to: "c3_konec", flag: "priznalFabrika", if: st => F(st).podepsal || F(st).svejk, rec: ["zdroj KUBÍČKOVÁ", "Syn mistra H. se na dvoře přiznal k spolupráci. Lidé ztichli. Mistr H. odešel domů dřív. Já také."] }
+    ]
+  },
+
+  /* --- větev: vojna (odmítl) --- */
+  c3_vojna: {
+    where: "18. listopadu 1989 · kasárna kdesi na Moravě",
+    text: [
+      "Na vysokou tě nevzali. „Politicky nevyhraněný.“ V říjnu jsi nastoupil na vojnu. Dva roky. Mazáci ti už stihli vysvětlit, kolik dní zbývá do civilu. Tobě sedm set dvacet čtyři.",
+      "Ráno na nástupu politruk čte z Rudého práva, že v Praze došlo k provokaci. V noci na ubikaci posloucháte pod dekou Svobodnou Evropu na tranzistoráku. Tam se říká, že je mrtvý student. Nikdo neví, co je pravda.",
+      "Ve středu vyhlásí pohotovost. Na plac přijedou tatrovky. Velitel roty řekne, ať se připravíte na odjezd „proti výtržníkům v Praze“.",
+      st => F(st).martinZustal ? "Martin je v Praze. Píše ti dopis, kde stojí jen: Jsem na Letné. Kdyby ses tu objevil v uniformě, tak tě nepoznám." : ""
+    ],
+    choices: [
+      { t: "Podepsat s klukama prohlášení na podporu studentů.", to: "c3_vojna_noc", flag: "podpisVojna", rec: ["VKR, vojenská kontrarozvědka", "Vojín H. podepsal protistátní prohlášení. Pozn.: týž H. odmítl v roce 1988 spolupráci s StB. Vykazuje podezřelou zásadovost."] },
+      { t: "Mlčet a čistit samopal.", to: "c3_vojna_noc", rec: ["VKR, vojenská kontrarozvědka", "Vojín H. se choval ukázněně. Samopal vzorně vyčištěn."] },
+      { t: "Zeptat se politruka, proti komu přesně pojedeme, když výtržníci jsou podle televize studenti a my jsme taky skoro studenti.", to: "c3_vojna_noc", flag: "otazka", rec: ["VKR, vojenská kontrarozvědka", "Vojín H. kladl provokativní otázky. Politruk odpověděl: „Až to bude, tak to bude.“ Odpověď hodnotím jako nedostatečnou."] }
+    ]
+  },
+  c3_vojna_noc: {
+    where: "22.–27. listopadu 1989 · kasárna",
+    text: [
+      "Tatrovky nikam neodjedou. Stojí na placu s nastartovanými motory dvě noci. Pak je někdo vypne, protože dochází nafta.",
+      "Velitel roty začne nosit tranzistorák v kapse a dělat, že ho neposlouchá. Politruk vynechá ranní čtení novin. Pak vynechá i nástup.",
+      "V pondělí ve dvanáct se v kasárnách nic nestane. Jen kapitán stojí dvě minuty u okna kanceláře a nehýbe se. Pak se otočí a řekne: „Pokračujte.“ Nikdo neví v čem."
+    ],
+    choices: [
+      { t: "Pokračovat. Do civilu zbývá sedm set dní.", to: "c3_konec" }
+    ]
+  },
+
+  /* --- větev: emigrace --- */
+  c3_tabor: {
+    where: "Listopad 1989 · uprchlický tábor Traiskirchen",
+    text: [
+      "Ve společenské místnosti běží rakouská televize. Václavák plný lidí, klíče nad hlavami. Rakušan od vedlejší postele ti potřese rukou a gratuluje, jako bys to udělal ty.",
+      st => F(st).sMartinem ? "Martin stojí u televize s rukama v kapsách. „No super,“ řekne. „Takže jsme utekli zbytečně.“ A pak se začne smát tak, že ho musíš odvést na chodbu." : "Na chodbě je jeden telefon a fronta na něj sahá až ke schodům.",
+      "Máma pracuje na poště. Když zavoláš mezistátní hovor přímo tam, je šance, že to vezme ona."
+    ],
+    choices: [
+      { t: "Postavit se do fronty a zavolat mámě na poštu.", to: "c3_tabor_prosinec", flag: "volalMame", rec: ["odposlech, Správa pasů a víz", "Hovor ze zahraničí na poštovní úřad. Volající pravděpodobně syn úřednice H. Úřednice plakala. Obsah bezvýznamný. Pozn.: odposlech je zřejmě poslední, nikdo nepodepsal další."] },
+      { t: "Poslat Koubkovi pohlednici: Pozdrav ze svobodného světa. Počasí pěkné.", to: "c3_tabor_prosinec", flag: "pohled", rec: ["npor. Koubek", "Obdržena pohlednice z Rakouska. Obsah: počasí. Pohlednice založena do svazku. Fotografii Vídně ponechávám."] },
+      { t: "Jít na pohovor kvůli vízu do Kanady. Na to, co se děje doma, teď nemáš sílu.", to: "c3_tabor_prosinec", flag: "kanada" }
+    ]
+  },
+  c3_tabor_prosinec: {
+    where: "Prosinec 1989 · Traiskirchen",
+    text: [
+      "Hranice se otevírá. Na přechodech stříhají ostnatý drát a lidi si odnášejí kousky domů na památku. Rakouské noviny píšou, že se emigranti mohou vrátit a nikdo je nebude trestat. Úplně jisté to ale není.",
+      st => F(st).kanada ? "Ve stejný den, kdy padne drát, ti přijde dopis z kanadského velvyslanectví. Pohovor 15. ledna. Toronto." : "",
+      st => F(st).sMartinem ? "Martin už má sbalenou igelitku. „Jedu domů na Vánoce. A pak uvidím.“" : ""
+    ],
+    choices: [
+      { t: "Jet domů na Vánoce.", to: "c3_konec", flag: "vratilSe" },
+      { t: "Zůstat. Když už jsi jednou utekl, tak to dotáhni.", to: "c3_konec", flag: "zustalVen" }
+    ]
+  },
+
+  c3_konec: {
+    end: true, chapter: "Konec třetí kapitoly",
+    title: "4. prosince 1989",
+    lead: st => {
+      const f = F(st);
+      if (f.vratilSe) return "Na Štědrý den stojíš u dveří bytu. Máma otevře, podívá se na tebe a jde dosolit bramborový salát. Pak se v kuchyni rozpláče. Táta řekne jen: „Tak ses vrátil do jiný republiky.“";
+      if (f.zustalVen) return f.kanada ? "V lednu letíš do Toronta. Doma všichni slaví a ty se díváš z letadla na Atlantik. Svobodný člověk, říká si. Ze všech nejsvobodnější." : "Silvestra slavíš ve Vídni na ulici s cizími lidmi. Doma slaví taky. Napíšeš domů dopis, který tentokrát poštou opravdu dojde. Přesto ho nepošleš.";
+      if (f.odmitl) return "Do civilu zbývá šest set osmdesát dní. Vojna se zkracuje, prý na rok. Kluci, kteří loni podepsali, už sedí na fakultách ve stávkových výborech. Ty čistíš samopal, který nikdy nebude potřeba.";
+      if (f.priznalFabrika) return "Tátu nakonec neodvolají. Na tebe se dívají jinak. Kubíčková tě na schodech poprvé v životě nepozdraví. Ani ty ji.";
+      if (f.zastalSe) return "Tátu odvolají v lednu na schůzi, na které promluví šest lidí, kteří byli ve straně déle než on. Večer se ptá: „Proč jsi tam tak křičel?“ Neodpovíš.";
+      return "Tátu odvolají v lednu. Ty se vrátíš na fakultu a pokračuješ ve stávce. Nikdo se tě na nic neptá. Zatím.";
+    },
+    rec: ["npor. Koubek", "4. 12. 1989. Svazek č. 24-881 navržen ke skartaci. Pro nedostatek času zatím neprovedeno."],
+    next: "c4_soon"
+  },
+
+  c4_soon: { soon: true }
 };
 
 /* ---------- engine ---------- */
@@ -497,21 +650,24 @@ function renderCard(n) {
   const p = el("div", "prose"); p.appendChild(el("p", null, val(n.lead, st))); box.appendChild(p);
   const b = el("button", "choice"); b.type = "button"; b.id = "next-" + st.node;
   b.append(el("span", "k", "→"), el("span", null, n.end ? "Pokračovat" : "Začít"));
-  b.addEventListener("click", () => { go(n.next); scrollUp(); });
+  b.addEventListener("click", () => {
+    if (n.rec) { st.records.push([val(n.rec[0], st), val(n.rec[1], st)]); drawRecords(true); }
+    go(n.next); scrollUp();
+  });
   box.appendChild(b);
   $scene.appendChild(box);
 }
 
 function renderSoon() {
   const box = el("div", "chapter fade");
-  box.append(el("span", "num", "Kapitola třetí"), el("h2", null, "Náměstí"));
+  box.append(el("span", "num", "Kapitola čtvrtá"), el("h2", null, "Seznamy"));
   const p = el("div", "prose");
   const f = st.flags;
-  const line = f.emigroval
-    ? "Listopad 1989 uvidíš v televizi v uprchlickém táboře. Lidé kolem tebe cinkají klíči a ty nevíš, jestli jsi právě vyhrál, nebo prohrál."
-    : (f.odmitl
-      ? "Na podzim nastoupíš na vojnu. V listopadu vám velitel řekne, ať se připravíte na zásah proti „výtržníkům“ v Praze."
-      : "V listopadu budeš stát na náměstí a cinkat klíči. Vedle lidí, o kterých jsi psal. Nebo o kterých jsi nepsal, ale v tom spisu to tak nevypadá.");
+  const line = (f.zustalVen)
+    ? "Rok 1992. V Praze vyjdou seznamy spolupracovníků StB. Dozvíš se to z krajanských novin, o měsíc později než ostatní."
+    : ((f.podepsal || f.svejk)
+      ? "Rok 1992. V novinách vyjdou seznamy spolupracovníků StB. Koubek mezitím otevřel cestovní kancelář a hledá schopné lidi."
+      : "Rok 1992. V novinách vyjdou seznamy spolupracovníků StB. Ty v nich nejsi. Začneš číst, kdo v nich je.");
   p.append(el("p", null, line), el("p", null, "Tahle kapitola se teprve píše. Tvoje rozhodnutí si hra pamatuje."));
   box.appendChild(p);
   const b = el("button", "choice"); b.type = "button"; b.id = "again";
